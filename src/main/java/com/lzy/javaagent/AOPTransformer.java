@@ -39,7 +39,15 @@ public class AOPTransformer implements ClassFileTransformer {
                 CtClass ctClass = classPool.makeClass(new ByteArrayInputStream(classfileBuffer));
                 CtMethod[] declaredMethods = ctClass.getDeclaredMethods();
                 for (CtMethod declaredMethod : declaredMethods) {
-                    declaredMethod.insertBefore("System.out.println(\"before invoke"+ declaredMethod.getName() + "\");");
+                    if(declaredMethod == null) {
+                        continue;
+                    }
+                    // 在方法开头插入获取当前时间的代码
+                    declaredMethod.addLocalVariable("startTime", CtClass.longType);
+                    declaredMethod.insertBefore("{ startTime = System.currentTimeMillis(); }");
+
+                    // 在方法结尾插入计算时间差的代码并输出
+                    declaredMethod.insertAfter("{ System.out.println(\"" + declaredMethod.getName() + " execution time: \" + (System.currentTimeMillis() - startTime) + \"ms\"); }");
                 }
                 return ctClass.toBytecode();
             } catch (Exception e) {
