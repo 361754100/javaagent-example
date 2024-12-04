@@ -12,6 +12,6 @@ public class TestByteBuddyInstall {
     public static void main(String[] args) {
         Instrumentation install = ByteBuddyAgent.install();
         System.out.println(install);
-//        install.addTransformer();
+        install.addTransformer(new AOPTransformer("com.lzy.javaagent.Test"));
     }
 }
